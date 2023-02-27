@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openvpn
+  labels:
+    app: openvpn
+    chart: openvpn-4.2.5
+    release: openvpn
+    heritage: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openvpn
+      release: openvpn
+  template:
+    metadata:
+      labels:
+        app: openvpn
+        release: openvpn
+      annotations:
+        checksum/config: 3256a6034bfd5fd718784cd4bc456ff5f9a5d2db1931a3dda81502c6cbef700f
+    spec:
+      initContainers:
+        - args:
+            - -c
+            - sysctl -w net.ipv4.ip_forward=1
+          command:
+            - /bin/sh
+          image: busybox:1.29
+          imagePullPolicy: IfNotPresent
+          name: sysctl
+          resources:
+            requests:
+              cpu: 1m
+              memory: 1Mi
+          securityContext:
+            privileged: true
+      containers:
+      - name: openvpn
+        image: "jfelten/openvpn-docker:1.1.0"
+        imagePullPolicy: IfNotPresent
+        command: ["/etc/openvpn/setup/configure.sh"]
+        ports:
+        - containerPort: 443
+          name: openvpn
+        securityContext:
+          capabilities:
+            add:
+              - NET_ADMIN
+        readinessProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 2
+          exec:
+            command:
+            - nc
+            - -u
+            - -z
+            - 127.0.0.1
+            - "443"
+        resources:
+          requests:
+            cpu: "300m"
+            memory: "128Mi"
+          limits:
+            cpu: "300m"
+            memory: "128Mi"
+        volumeMounts:
+          - mountPath: /etc/openvpn/setup
+            name: openvpn
+            readOnly: false
+          - mountPath: /etc/openvpn/certs
+            name: certs
+            readOnly: false
+      volumes:
+      - name: openvpn
+        configMap:
+          name: openvpn
+          defaultMode: 0775
+      - name: certs
+        persistentVolumeClaim:
+          claimName: openvpn

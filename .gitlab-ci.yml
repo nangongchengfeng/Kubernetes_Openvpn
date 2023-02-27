@@ -1,0 +1,29 @@
+stages:
+  - uat_deploy
+  - prod_deploy
+
+openvpn(main-apply):
+  stage: uat_deploy
+  environment:
+    name: main
+  tags:
+    - main
+  only:
+    - main
+  script:
+    - /usr/bin/kubectl apply -f openvpn -n openvpn
+  when: manual
+
+openvpn(main-delete):
+  stage: uat_deploy
+  environment:
+    name: main
+  tags:
+    - main
+  only:
+    - main
+  script:
+    - /usr/bin/kubectl delete -f openvpn -n openvpn
+  when: manual
+
+
