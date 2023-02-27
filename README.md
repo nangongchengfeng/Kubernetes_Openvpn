@@ -8,3 +8,13 @@ VPN直译就是虚拟专用通道，是提供给企业之间或者个人与公�
 它大量使用了OpenSSL加密库中的SSLv3/TLSv1协议函数库。
 
 目前OpenVPN能在Solaris、Linux、OpenBSD、FreeBSD、NetBSD、Mac OS X与Microsoft Windows以及Android和iOS上运行，并包含了许多安全性的功能。它并不是一个基于Web的VPN软件，也不与IPsec及其他VPN软件包兼容
+
+
+
+# 配合Gitlab的CD发布
+
+![1677483016028](images/1677483016028.png)
+
+![1677482996611](images/1677482996611.png)
+
+![1677483006187](images/1677483006187.png)
